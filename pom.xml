@@ -69,7 +69,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
         </dependency>
 
         <!-- spring boot devtools -->
@@ -164,22 +163,6 @@
                         </compilerArg>
                     </compilerArgs>
                 </configuration>
-            </plugin>
-            <!-- code formatter : google style -->
-            <plugin>
-                <groupId>com.coveo</groupId>
-                <artifactId>fmt-maven-plugin</artifactId>
-                <version>${fmt.maven.version}</version>
-                <configuration>
-                    <style>google</style>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
