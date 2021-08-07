@@ -1,7 +1,7 @@
 package com.example.demo.order.service;
 
-import com.example.demo.order.model.Order;
+import com.example.demo.order.service.dto.OrderDTO;
 
 public interface OrderService {
-    Order saveOrder(Order order);
+    OrderDTO saveOrder(OrderDTO orderDTO);
 }

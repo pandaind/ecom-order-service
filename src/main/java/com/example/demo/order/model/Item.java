@@ -40,6 +40,12 @@ public class Item {
     @JsonIgnore
     private List<Order> orders;
 
+    public Item(@NotNull int quantity, Product product, BigDecimal subTotal) {
+        this.quantity = quantity;
+        this.product = product;
+        this.subTotal = subTotal;
+    }
+
 
     @Override
     public boolean equals(Object o) {
