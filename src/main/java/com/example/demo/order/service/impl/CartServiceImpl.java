@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.example.demo.order.service.utils.CartUtils.addItemToCart;
 import static com.example.demo.order.service.utils.CartUtils.getSubTotalForItem;
@@ -37,7 +38,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Optional<Cart> getCart(String cartId) {
-        return this.cartRedisRepository.findById(cartId);
+        Optional<Cart> cart = this.cartRedisRepository.findById(cartId);
+        if (cart.isPresent()) {
+            cart = refreshCart(cart.get());
+        }
+        return cart;
     }
 
     @Override
@@ -51,7 +56,10 @@ public class CartServiceImpl implements CartService {
             Optional<Item> existingItem = items.parallelStream()
                     .filter(item -> (item.getProduct().getId()).equals(productId))
                     .findFirst();
-            existingItem.ifPresent(items::remove);
+
+            existingItem.ifPresent(i ->
+                items.removeIf(item -> item.getProduct().getId().equals(i.getProduct().getId()))
+            );
 
             items.add(getNewItemWithProductDetails(productId, quantity));
 
@@ -59,6 +67,17 @@ public class CartServiceImpl implements CartService {
         }
 
         return save(addItemToCart(cartId, getNewItemWithProductDetails(productId, quantity)));
+    }
+
+    private Optional<Cart> refreshCart(Cart cart) {
+        if (cart!=null && cart.getItems()!=null) {
+            List<Item> items = cart.getItems()
+                    .parallelStream()
+                    .map(item -> getNewItemWithProductDetails(item.getProduct().getId(), item.getQuantity()))
+                    .collect(Collectors.toList());
+            return Optional.ofNullable(save(addItemToCart(cart, items)));
+        }
+        return Optional.empty();
     }
 
     private Item getNewItemWithProductDetails(Long productId, Integer quantity) {

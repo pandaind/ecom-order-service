@@ -1,7 +1,9 @@
 package com.example.demo.order.service.impl;
 
 import com.example.demo.order.model.Order;
+import com.example.demo.order.model.User;
 import com.example.demo.order.repository.OrderRepository;
+import com.example.demo.order.repository.UserRepository;
 import com.example.demo.order.service.OrderService;
 import com.example.demo.order.service.dto.OrderDTO;
 import com.example.demo.order.service.mapper.OrderMapper;
@@ -9,17 +11,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Slf4j
 @Service
+@Transactional
 public class OrderServiceImpl implements OrderService {
 
-    private final OrderRepository repository;
+    private final OrderRepository orderRepository;
+
+    private final UserRepository userRepository;
 
     private final OrderMapper mapper;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository repository, OrderMapper mapper) {
-        this.repository = repository;
+    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository, OrderMapper mapper) {
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
         this.mapper = mapper;
     }
 
@@ -27,7 +35,13 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO saveOrder(OrderDTO orderDTO) {
         log.debug("Request to save Order : {}", orderDTO);
         Order order = this.mapper.toEntity(orderDTO);
-        order = this.repository.save(order);
+        // save the user
+        User user = this.userRepository.save(order.getUser());
+
+        //add persisted users to order
+        order.setUser(user);
+        order = this.orderRepository.save(order);
+
         return this.mapper.toDto(order);
     }
 }

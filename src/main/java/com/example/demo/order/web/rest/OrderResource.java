@@ -11,10 +11,7 @@ import com.example.demo.order.web.rest.util.HeaderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping(value ="/api")
 public class OrderResource {
 
     private static final String ENTITY_NAME = "Order";
@@ -44,18 +42,19 @@ public class OrderResource {
     }
 
     @PostMapping("/orders/{userId}")
-    public ResponseEntity<Optional<OrderDTO>> saveOrder(@PathVariable("userId") long userId, @RequestHeader("Cookie") String cartId) throws URISyntaxException {
+    public ResponseEntity<OrderDTO> saveOrder(@PathVariable("userId") long userId, @RequestHeader("Cookie") String cartId) throws URISyntaxException {
         List<Item> cart = this.cartService.getAllItemsFromCart(cartId);
         User user = this.userClient.getUserById(userId);
-        Optional<OrderDTO> order = this.createOrder(cart, user);
+        Optional<OrderDTO> orderReq = this.createOrder(cart, user);
 
-        if (order.isPresent()) {
-            this.orderService.saveOrder(order.get());
+        if (orderReq.isPresent()) {
+            OrderDTO order = orderReq.get();
+            order = this.orderService.saveOrder(order);
             this.cartService.deleteCart(cartId);
 
             return ResponseEntity.created(new URI("/orders/" + userId))
                     .headers(HeaderUtil.createEntityCreationAlert(applicationName,
-                            false, ENTITY_NAME, order.get().getId().toString()))
+                            false, ENTITY_NAME, order.getId().toString()))
                     .body(order);
         } else {
             return ResponseEntity.unprocessableEntity().build();
