@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value ="/api")
+@RequestMapping(value = "/api")
 public class CartResource {
 
     private static final String ENTITY_NAME = "Cart";
