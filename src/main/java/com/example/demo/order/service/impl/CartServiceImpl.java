@@ -58,7 +58,7 @@ public class CartServiceImpl implements CartService {
                     .findFirst();
 
             existingItem.ifPresent(i ->
-                items.removeIf(item -> item.getProduct().getId().equals(i.getProduct().getId()))
+                    items.removeIf(item -> item.getProduct().getId().equals(i.getProduct().getId()))
             );
 
             items.add(getNewItemWithProductDetails(productId, quantity));
@@ -70,7 +70,7 @@ public class CartServiceImpl implements CartService {
     }
 
     private Optional<Cart> refreshCart(Cart cart) {
-        if (cart!=null && cart.getItems()!=null) {
+        if (cart != null && cart.getItems() != null) {
             List<Item> items = cart.getItems()
                     .parallelStream()
                     .map(item -> getNewItemWithProductDetails(item.getProduct().getId(), item.getQuantity()))
