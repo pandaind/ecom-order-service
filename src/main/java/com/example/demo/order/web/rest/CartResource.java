@@ -35,7 +35,7 @@ public class CartResource {
 
     @PostMapping(value = "/cart", params = {"productId", "quantity"})
     public ResponseEntity<Optional<Cart>> addItemToCart(@RequestParam("productId") Long productId,
-                                                        @RequestParam("quantity") Integer quantity,
+                                                        @RequestParam("quantity") Long quantity,
                                                         @RequestHeader(value = "Cookie") String cartId) throws URISyntaxException {
 
         Optional<Cart> cart = Optional.ofNullable(this.service.addOrUpdate(cartId, productId, quantity));

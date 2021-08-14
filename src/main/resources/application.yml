@@ -1,18 +1,6 @@
 spring:
   profiles:
     active: dev
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
-
-eureka:
-  client:
-    service-url:
-      default-zone: http://localhost:8761/eureka
-  instance:
-    instance-id: ${spring.application.name}:${random.uuid}
-    appname: order-service
 
 server:
   port: 0
@@ -31,6 +19,15 @@ spring:
   h2:
     console:
       enabled: true
+      path: /data
+      settings:
+        web-allow-others: true
+
+  datasource:
+    url: jdbc:h2:mem:orderdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
 
   jpa:
     show-sql: true
@@ -41,6 +38,20 @@ spring:
   redis:
     host: localhost
     port: 6370
+
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.uuid}
+    appname: order-service
+
 
 ---
 spring:

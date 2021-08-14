@@ -24,13 +24,16 @@ public class Order {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column(name = "order_id", nullable = false, unique = true)
+    private String orderId;
+
     @Column(name = "ordered_date")
     @NotNull
     private LocalDate orderDate;
 
     @Column(name = "status")
-    @NotNull
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @Column(name = "total")
     private BigDecimal total;

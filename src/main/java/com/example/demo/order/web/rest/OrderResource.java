@@ -1,23 +1,29 @@
 package com.example.demo.order.web.rest;
 
+import com.example.demo.order.client.InventoryClient;
 import com.example.demo.order.client.UserClient;
+import com.example.demo.order.model.Inventory;
 import com.example.demo.order.model.Item;
+import com.example.demo.order.model.OrderStatus;
 import com.example.demo.order.model.User;
 import com.example.demo.order.service.CartService;
 import com.example.demo.order.service.OrderService;
 import com.example.demo.order.service.dto.OrderDTO;
 import com.example.demo.order.service.utils.OrderUtils;
 import com.example.demo.order.web.rest.util.HeaderUtil;
+import com.example.demo.order.web.rest.util.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -31,17 +37,31 @@ public class OrderResource {
 
     private final UserClient userClient;
 
+    private final InventoryClient inventoryClient;
+
     @Value("${spring.application.name}")
     private String applicationName;
 
     @Autowired
-    public OrderResource(OrderService orderService, CartService cartService, UserClient userClient) {
+    public OrderResource(OrderService orderService,
+                         CartService cartService,
+                         UserClient userClient,
+                         InventoryClient inventoryClient) {
         this.orderService = orderService;
         this.cartService = cartService;
         this.userClient = userClient;
+        this.inventoryClient = inventoryClient;
+    }
+
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<OrderDTO> getByOrderId(@PathVariable("orderId") String orderId) {
+        return ResponseUtil.wrapNotFound(Optional.ofNullable(
+                this.orderService.getOrderByOrderId(orderId)
+        ));
     }
 
     @PostMapping("/orders/{userId}")
+    @Transactional
     public ResponseEntity<OrderDTO> saveOrder(@PathVariable("userId") long userId, @RequestHeader("Cookie") String cartId) throws URISyntaxException {
         List<Item> cart = this.cartService.getAllItemsFromCart(cartId);
         User user = this.userClient.getUserById(userId);
@@ -51,7 +71,7 @@ public class OrderResource {
             OrderDTO order = orderReq.get();
             order = this.orderService.saveOrder(order);
             this.cartService.deleteCart(cartId);
-
+            updateInventory(order);
             return ResponseEntity.created(new URI("/orders/" + userId))
                     .headers(HeaderUtil.createEntityCreationAlert(applicationName,
                             false, ENTITY_NAME, order.getId().toString()))
@@ -61,18 +81,32 @@ public class OrderResource {
         }
     }
 
-
     private Optional<OrderDTO> createOrder(List<Item> cart, User user) {
         if (cart == null || user == null) {
             return Optional.empty();
         }
-        OrderDTO order = new OrderDTO();
-        order.setItems(cart);
-        order.setUser(user);
-        order.setTotal(OrderUtils.countTotalPrice(cart));
-        order.setOrderDate(LocalDate.now());
-        order.setStatus("PAYMENT_EXPECTED");
-        return Optional.of(order);
+        cart = cart.stream().filter(this::checkInventory).collect(Collectors.toList());
+        if (!cart.isEmpty()) {
+            OrderDTO order = new OrderDTO();
+            order.setItems(cart);
+            order.setUser(user);
+            order.setOrderId(OrderUtils.generateOrderId());
+            order.setTotal(OrderUtils.countTotalPrice(cart));
+            order.setOrderDate(LocalDate.now());
+            order.setStatus(OrderStatus.NEW);
+            return Optional.of(order);
+        }
+        return Optional.empty();
+    }
+
+    private boolean checkInventory(Item item) {
+        Inventory inventory = this.inventoryClient.getInventory(item.getProduct().getSkuCode());
+        return inventory.getQuantity() >= item.getQuantity();
+    }
+
+    private void updateInventory(OrderDTO order) {
+        order.getItems().forEach(item -> this.inventoryClient.updateInventory(item.getProduct().getSkuCode(),
+                item.getQuantity()));
     }
 
 

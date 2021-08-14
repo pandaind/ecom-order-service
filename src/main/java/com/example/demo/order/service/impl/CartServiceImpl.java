@@ -1,7 +1,9 @@
 package com.example.demo.order.service.impl;
 
+import com.example.demo.order.client.InventoryClient;
 import com.example.demo.order.client.ProductClient;
 import com.example.demo.order.model.Cart;
+import com.example.demo.order.model.Inventory;
 import com.example.demo.order.model.Item;
 import com.example.demo.order.model.Product;
 import com.example.demo.order.repository.CartRedisRepository;
@@ -23,11 +25,15 @@ import static com.example.demo.order.service.utils.CartUtils.getSubTotalForItem;
 public class CartServiceImpl implements CartService {
 
     private final ProductClient productClient;
+    private final InventoryClient inventoryClient;
     private final CartRedisRepository cartRedisRepository;
 
     @Autowired
-    public CartServiceImpl(ProductClient productClient, CartRedisRepository cartRedisRepository) {
+    public CartServiceImpl(ProductClient productClient,
+                           InventoryClient inventoryClient,
+                           CartRedisRepository cartRedisRepository) {
         this.productClient = productClient;
+        this.inventoryClient = inventoryClient;
         this.cartRedisRepository = cartRedisRepository;
     }
 
@@ -46,7 +52,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart addOrUpdate(String cartId, Long productId, Integer quantity) {
+    public Cart addOrUpdate(String cartId, Long productId, Long quantity) {
         Optional<Cart> cart = this.cartRedisRepository.findById(cartId);
 
         if (cart.isPresent()) {
@@ -80,9 +86,14 @@ public class CartServiceImpl implements CartService {
         return Optional.empty();
     }
 
-    private Item getNewItemWithProductDetails(Long productId, Integer quantity) {
-        Product product = productClient.getProductById(productId);
-        return new Item(quantity, product, getSubTotalForItem(product, quantity));
+    private Item getNewItemWithProductDetails(Long productId, Long quantity) {
+        Optional<Product> product = Optional.ofNullable(productClient.getProductById(productId));
+        Optional<String> skuCode = product.map(Product::getSkuCode);
+        Inventory inventory = this.inventoryClient.getInventory(skuCode.orElseThrow(RuntimeException::new));
+        if (!(inventory != null && inventory.getQuantity() >= quantity)) {
+            quantity = 0L;
+        }
+        return new Item(quantity, product.get(), getSubTotalForItem(product.get(), quantity));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.demo.order.service.dto;
 
 import com.example.demo.order.model.Item;
+import com.example.demo.order.model.OrderStatus;
 import com.example.demo.order.model.User;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,8 +18,9 @@ import java.util.List;
 @ToString
 public class OrderDTO {
     private Long id;
+    private String orderId;
     private LocalDate orderDate;
-    private String status;
+    private OrderStatus status;
     private BigDecimal total;
     private List<Item> items;
     private User user;

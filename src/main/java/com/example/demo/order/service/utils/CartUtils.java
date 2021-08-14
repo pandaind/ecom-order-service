@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CartUtils {
-    public static BigDecimal getSubTotalForItem(Product product, int quantity) {
+    public static BigDecimal getSubTotalForItem(Product product, Long quantity) {
         return (product.getPrice()).multiply(BigDecimal.valueOf(quantity));
     }
 

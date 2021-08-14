@@ -44,4 +44,10 @@ public class OrderServiceImpl implements OrderService {
 
         return this.mapper.toDto(order);
     }
+
+    @Override
+    public OrderDTO getOrderByOrderId(String orderId) {
+        log.debug("Get Order by id : {}", orderId);
+        return this.mapper.toDto(this.orderRepository.findByOrderId(orderId));
+    }
 }

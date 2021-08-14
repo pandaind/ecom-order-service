@@ -26,7 +26,7 @@ public class Item {
 
     @Column(name = "quantity")
     @NotNull
-    private int quantity;
+    private Long quantity;
 
     @Column(name = "subtotal")
     @NotNull
@@ -40,7 +40,7 @@ public class Item {
     @JsonIgnore
     private List<Order> orders;
 
-    public Item(@NotNull int quantity, Product product, BigDecimal subTotal) {
+    public Item(@NotNull Long quantity, Product product, BigDecimal subTotal) {
         this.quantity = quantity;
         this.product = product;
         this.subTotal = subTotal;

@@ -1,5 +1,6 @@
 package com.example.demo.order.config.redis;
 
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -8,6 +9,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 
 @Configuration
 @EnableRedisRepositories
+@EnableCaching
 public class RedisConfiguration {
     @Bean
     public LettuceConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {

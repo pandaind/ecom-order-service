@@ -27,6 +27,10 @@ public class Product {
 
     private BigDecimal price;
 
+    private String category;
+
+    private String skuCode;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Item> items;
@@ -47,10 +51,14 @@ public class Product {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "productId = " + productId + ", " +
-                "id = " + id + ", " +
-                "productName = " + productName + ", " +
-                "price = " + price + ")";
+        return "Product{" +
+                "productId=" + productId +
+                ", id=" + id +
+                ", productName='" + productName + '\'' +
+                ", price=" + price +
+                ", category='" + category + '\'' +
+                ", skuCode='" + skuCode + '\'' +
+                ", items=" + items +
+                '}';
     }
 }

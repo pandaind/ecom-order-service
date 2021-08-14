@@ -11,7 +11,7 @@ public interface CartService {
 
     Optional<Cart> getCart(String cartId);
 
-    Cart addOrUpdate(String cartId, Long productId, Integer quantity);
+    Cart addOrUpdate(String cartId, Long productId, Long quantity);
 
     void deleteItemFromCart(String cartId, Long productId);
 
