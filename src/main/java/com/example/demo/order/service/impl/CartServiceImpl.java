@@ -91,7 +91,8 @@ public class CartServiceImpl implements CartService {
         Optional<String> skuCode = product.map(Product::getSkuCode);
         Inventory inventory = this.inventoryClient.getInventory(skuCode.orElseThrow(RuntimeException::new));
         if (!(inventory != null && inventory.getQuantity() >= quantity)) {
-            quantity = 0L;
+            assert inventory != null;
+            throw new RuntimeException("Items order quantity " + quantity + " , available quantity " + inventory.getQuantity());
         }
         return new Item(quantity, product.get(), getSubTotalForItem(product.get(), quantity));
     }

@@ -2,6 +2,7 @@ package com.example.demo.order.web.rest;
 
 import com.example.demo.order.client.InventoryClient;
 import com.example.demo.order.client.UserClient;
+import com.example.demo.order.event.OrderEventProducer;
 import com.example.demo.order.model.Inventory;
 import com.example.demo.order.model.Item;
 import com.example.demo.order.model.OrderStatus;
@@ -12,6 +13,7 @@ import com.example.demo.order.service.dto.OrderDTO;
 import com.example.demo.order.service.utils.OrderUtils;
 import com.example.demo.order.web.rest.util.HeaderUtil;
 import com.example.demo.order.web.rest.util.ResponseUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,8 @@ public class OrderResource {
 
     private final InventoryClient inventoryClient;
 
+    private final OrderEventProducer eventProducer;
+
     @Value("${spring.application.name}")
     private String applicationName;
 
@@ -46,11 +50,13 @@ public class OrderResource {
     public OrderResource(OrderService orderService,
                          CartService cartService,
                          UserClient userClient,
-                         InventoryClient inventoryClient) {
+                         InventoryClient inventoryClient,
+                         OrderEventProducer eventProducer) {
         this.orderService = orderService;
         this.cartService = cartService;
         this.userClient = userClient;
         this.inventoryClient = inventoryClient;
+        this.eventProducer = eventProducer;
     }
 
     @GetMapping("/orders/{orderId}")
@@ -62,7 +68,8 @@ public class OrderResource {
 
     @PostMapping("/orders/{userId}")
     @Transactional
-    public ResponseEntity<OrderDTO> saveOrder(@PathVariable("userId") long userId, @RequestHeader("Cookie") String cartId) throws URISyntaxException {
+    public ResponseEntity<OrderDTO> saveOrder(@PathVariable("userId") long userId, @RequestHeader("Cookie") String cartId)
+            throws URISyntaxException, JsonProcessingException {
         List<Item> cart = this.cartService.getAllItemsFromCart(cartId);
         User user = this.userClient.getUserById(userId);
         Optional<OrderDTO> orderReq = this.createOrder(cart, user);
@@ -72,6 +79,7 @@ public class OrderResource {
             order = this.orderService.saveOrder(order);
             this.cartService.deleteCart(cartId);
             updateInventory(order);
+            this.eventProducer.sendEvent(OrderUtils.createOrderEvent(order));
             return ResponseEntity.created(new URI("/orders/" + userId))
                     .headers(HeaderUtil.createEntityCreationAlert(applicationName,
                             false, ENTITY_NAME, order.getId().toString()))

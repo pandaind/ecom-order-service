@@ -47,6 +47,9 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "event_status")
+    @Enumerated(EnumType.STRING)
+    private EventStatus eventStatus;
 
     @Override
     public boolean equals(Object o) {

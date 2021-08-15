@@ -25,7 +25,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper mapper;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository, OrderMapper mapper) {
+    public OrderServiceImpl(OrderRepository orderRepository,
+                            UserRepository userRepository,
+                            OrderMapper mapper) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.mapper = mapper;
@@ -41,7 +43,6 @@ public class OrderServiceImpl implements OrderService {
         //add persisted users to order
         order.setUser(user);
         order = this.orderRepository.save(order);
-
         return this.mapper.toDto(order);
     }
 
@@ -49,5 +50,13 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO getOrderByOrderId(String orderId) {
         log.debug("Get Order by id : {}", orderId);
         return this.mapper.toDto(this.orderRepository.findByOrderId(orderId));
+    }
+
+    @Override
+    public OrderDTO updateOrder(OrderDTO orderDTO) {
+        log.debug("Request to save Order : {}", orderDTO);
+        Order order = this.mapper.toEntity(orderDTO);
+        order = this.orderRepository.save(order);
+        return this.mapper.toDtoId(order);
     }
 }

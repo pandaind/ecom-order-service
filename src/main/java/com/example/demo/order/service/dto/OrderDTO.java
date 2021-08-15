@@ -1,8 +1,10 @@
 package com.example.demo.order.service.dto;
 
+import com.example.demo.order.model.EventStatus;
 import com.example.demo.order.model.Item;
 import com.example.demo.order.model.OrderStatus;
 import com.example.demo.order.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +19,7 @@ import java.util.List;
 @EqualsAndHashCode
 @ToString
 public class OrderDTO {
+    @JsonIgnore
     private Long id;
     private String orderId;
     private LocalDate orderDate;
@@ -24,4 +27,6 @@ public class OrderDTO {
     private BigDecimal total;
     private List<Item> items;
     private User user;
+    @JsonIgnore
+    private EventStatus eventStatus = EventStatus.NEW;
 }

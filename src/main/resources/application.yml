@@ -22,7 +22,6 @@ spring:
       path: /data
       settings:
         web-allow-others: true
-
   datasource:
     url: jdbc:h2:mem:orderdb
     username: sa
@@ -39,10 +38,27 @@ spring:
     host: localhost
     port: 6370
 
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        acks: all
+        retries: 10
+        retry.backoff.ms: 1000
+
   boot:
     admin:
       client:
         url: http://localhost:9090
+  sleuth:
+    integration:
+      enabled: true
+    sampler:
+      probability: 1
+  zipkin:
+    base-url: http://localhost:9411/
 
 eureka:
   client:
