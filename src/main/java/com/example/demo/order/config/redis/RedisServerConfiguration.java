@@ -8,10 +8,10 @@ import javax.annotation.PreDestroy;
 
 @Configuration
 public class RedisServerConfiguration {
-    private RedisServer redisServer;
+    private final RedisServer redisServer;
 
     public RedisServerConfiguration(RedisProperties redisProperties) {
-        this.redisServer = new RedisServer(redisProperties.getRedisPort());
+        this.redisServer = new RedisServer(redisProperties.getPort());
     }
 
     @PostConstruct

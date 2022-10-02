@@ -2,19 +2,12 @@ package com.example.demo.order.config.redis;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@Configuration
+@ConfigurationProperties(prefix = "spring.redis")
 public class RedisProperties {
-    private int redisPort;
-    private String redisHost;
-
-    public RedisProperties(@Value("${spring.redis.host}") String redisHost,
-                           @Value("${spring.redis.port}") int redisPort) {
-        this.redisPort = redisPort;
-        this.redisHost = redisHost;
-    }
+    private int port;
+    private String host;
 }

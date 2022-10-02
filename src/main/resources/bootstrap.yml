@@ -17,6 +17,7 @@ spring:
         binder:
           auto-add-partitions: true
 
+
 server:
   port: 0
 
