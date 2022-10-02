@@ -8,6 +8,8 @@ import com.example.demo.order.model.Item;
 import com.example.demo.order.model.Product;
 import com.example.demo.order.repository.CartRedisRepository;
 import com.example.demo.order.service.CartService;
+import com.example.demo.order.service.dto.ItemDTO;
+import com.example.demo.order.service.mapper.ItemMapper;
 import com.example.demo.order.service.utils.CartUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +30,16 @@ public class CartServiceImpl implements CartService {
     private final InventoryClient inventoryClient;
     private final CartRedisRepository cartRedisRepository;
 
+    private final ItemMapper itemMapper;
+
     @Autowired
     public CartServiceImpl(ProductClient productClient,
                            InventoryClient inventoryClient,
-                           CartRedisRepository cartRedisRepository) {
+                           CartRedisRepository cartRedisRepository, ItemMapper itemMapper) {
         this.productClient = productClient;
         this.inventoryClient = inventoryClient;
         this.cartRedisRepository = cartRedisRepository;
+        this.itemMapper = itemMapper;
     }
 
     @Override
@@ -118,9 +123,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<Item> getAllItemsFromCart(String cartId) {
+    public List<ItemDTO> getAllItemsFromCart(String cartId) {
         Optional<Cart> cart = this.cartRedisRepository.findById(cartId);
-        return cart.orElse(new Cart()).getItems();
+        return this.itemMapper.toDto(cart.orElse(new Cart()).getItems());
     }
 
     @Override

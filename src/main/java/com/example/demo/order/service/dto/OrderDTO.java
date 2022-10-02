@@ -25,8 +25,8 @@ public class OrderDTO {
     private LocalDate orderDate;
     private OrderStatus status;
     private BigDecimal total;
-    private List<Item> items;
-    private User user;
+    private List<ItemDTO> items;
+    private UserDTO user;
     @JsonIgnore
     private EventStatus eventStatus = EventStatus.NEW;
 }

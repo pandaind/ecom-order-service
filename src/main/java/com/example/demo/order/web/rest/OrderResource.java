@@ -9,7 +9,9 @@ import com.example.demo.order.model.OrderStatus;
 import com.example.demo.order.model.User;
 import com.example.demo.order.service.CartService;
 import com.example.demo.order.service.OrderService;
+import com.example.demo.order.service.dto.ItemDTO;
 import com.example.demo.order.service.dto.OrderDTO;
+import com.example.demo.order.service.dto.UserDTO;
 import com.example.demo.order.service.utils.OrderUtils;
 import com.example.demo.order.web.rest.util.HeaderUtil;
 import com.example.demo.order.web.rest.util.ResponseUtil;
@@ -70,8 +72,8 @@ public class OrderResource {
     @Transactional
     public ResponseEntity<OrderDTO> saveOrder(@PathVariable("userId") long userId, @RequestHeader("Cookie") String cartId)
             throws URISyntaxException, JsonProcessingException {
-        List<Item> cart = this.cartService.getAllItemsFromCart(cartId);
-        User user = this.userClient.getUserById(userId);
+        List<ItemDTO> cart = this.cartService.getAllItemsFromCart(cartId);
+        UserDTO user = this.userClient.getUserById(userId);
         Optional<OrderDTO> orderReq = this.createOrder(cart, user);
 
         if (orderReq.isPresent()) {
@@ -89,7 +91,7 @@ public class OrderResource {
         }
     }
 
-    private Optional<OrderDTO> createOrder(List<Item> cart, User user) {
+    private Optional<OrderDTO> createOrder(List<ItemDTO> cart, UserDTO user) {
         if (cart == null || user == null) {
             return Optional.empty();
         }
@@ -107,7 +109,7 @@ public class OrderResource {
         return Optional.empty();
     }
 
-    private boolean checkInventory(Item item) {
+    private boolean checkInventory(ItemDTO item) {
         Inventory inventory = this.inventoryClient.getInventory(item.getProduct().getSkuCode());
         return inventory.getQuantity() >= item.getQuantity();
     }

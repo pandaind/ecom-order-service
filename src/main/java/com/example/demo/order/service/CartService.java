@@ -2,6 +2,7 @@ package com.example.demo.order.service;
 
 import com.example.demo.order.model.Cart;
 import com.example.demo.order.model.Item;
+import com.example.demo.order.service.dto.ItemDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ public interface CartService {
 
     boolean checkIfItemIsExist(String cartId, Long productId);
 
-    List<Item> getAllItemsFromCart(String cartId);
+    List<ItemDTO> getAllItemsFromCart(String cartId);
 
     void deleteCart(String cartId);
 }

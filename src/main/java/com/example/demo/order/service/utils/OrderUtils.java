@@ -3,6 +3,7 @@ package com.example.demo.order.service.utils;
 import com.example.demo.order.event.OrderEvent;
 import com.example.demo.order.event.OrderEventType;
 import com.example.demo.order.model.Item;
+import com.example.demo.order.service.dto.ItemDTO;
 import com.example.demo.order.service.dto.OrderDTO;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -11,9 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class OrderUtils {
-    public static BigDecimal countTotalPrice(List<Item> cart) {
+    public static BigDecimal countTotalPrice(List<ItemDTO> cart) {
         return cart.parallelStream()
-                .map(Item::getSubTotal)
+                .map(ItemDTO::getSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
