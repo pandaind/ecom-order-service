@@ -1,5 +1,6 @@
 package com.example.demo.order.config.redis;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,9 +12,17 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 @EnableRedisRepositories
 @EnableCaching
 public class RedisConfiguration {
+
+    private final RedisProperties redisProperties;
+
+    @Autowired
+    public RedisConfiguration(RedisProperties redisProperties) {
+        this.redisProperties = redisProperties;
+    }
+
     @Bean
-    public LettuceConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {
-        return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
+    public LettuceConnectionFactory redisConnectionFactory() {
+        return new LettuceConnectionFactory(this.redisProperties.getHost(), this.redisProperties.getPort());
     }
 
     @Bean
