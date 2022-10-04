@@ -49,7 +49,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Cacheable(key = "#orderId", value = "Order", unless = "result.total > 100000")
+//    @Cacheable(key = "#orderId", value = "Order", unless = "result.total > 100000")
+    @Cacheable(key = "#orderId", value = "Order")
     public OrderDTO getOrderByOrderId(String orderId) {
         log.debug("Get Order by id : {}", orderId);
         return this.mapper.toDto(this.orderRepository.findByOrderId(orderId));
