@@ -9,6 +9,8 @@ import com.example.demo.order.service.dto.OrderDTO;
 import com.example.demo.order.service.mapper.OrderMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -47,12 +49,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Cacheable(key = "#orderId", value = "Order", unless = "result.total > 100000")
     public OrderDTO getOrderByOrderId(String orderId) {
         log.debug("Get Order by id : {}", orderId);
         return this.mapper.toDto(this.orderRepository.findByOrderId(orderId));
     }
 
     @Override
+    @CachePut(key = "#orderId", value = "Order")
     public OrderDTO updateOrder(OrderDTO orderDTO) {
         log.debug("Request to save Order : {}", orderDTO);
         Order order = this.mapper.toEntity(orderDTO);
