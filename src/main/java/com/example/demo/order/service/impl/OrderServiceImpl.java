@@ -50,14 +50,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
 //    @Cacheable(key = "#orderId", value = "Order", unless = "result.total > 100000")
-    @Cacheable(key = "#orderId", value = "Order")
+    @Cacheable(key = "#orderId", value = "OrderDTO")
     public OrderDTO getOrderByOrderId(String orderId) {
         log.debug("Get Order by id : {}", orderId);
         return this.mapper.toDto(this.orderRepository.findByOrderId(orderId));
     }
 
     @Override
-    @CachePut(key = "#orderId", value = "Order")
+    @CachePut(key = "#orderId", value = "OrderDTO")
     public OrderDTO updateOrder(OrderDTO orderDTO) {
         log.debug("Request to save Order : {}", orderDTO);
         Order order = this.mapper.toEntity(orderDTO);
