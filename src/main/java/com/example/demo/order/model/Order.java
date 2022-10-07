@@ -7,6 +7,7 @@ import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +19,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "orders")
 @Cacheable
-public class Order {
+public class Order implements Serializable {
+    private static final long serialVersionUID = -6386180654980460059L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
