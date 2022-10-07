@@ -25,7 +25,7 @@ public class User implements Serializable {
     @Column(name = "user_name")
     private String userName;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Order> orders;
 
