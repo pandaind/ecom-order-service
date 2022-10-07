@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +16,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "products")
 @Cacheable
-public class Product {
+public class Product implements Serializable {
+    private static final long serialVersionUID = -818184442419043799L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
